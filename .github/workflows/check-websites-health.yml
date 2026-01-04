@@ -1,0 +1,52 @@
+name: Keep Supabase Active
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # This runs every day at midnight
+  workflow_dispatch:
+
+jobs:
+  keep-alive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Check React apps
+        run: |
+          npm install playwright
+          npx playwright install chromium
+          
+          node -e "
+          const { chromium } = require('playwright');
+          const urls = [
+            'https://prompt.softery.io',
+            'https://recipe.softery.io',
+            'https://vkusnyashki.poznyaks.com',
+            'https://evgeniy.poznyaks.com',
+            'https://oydwzeanlzbmsfzyogia.supabase.co/functions/v1/health',
+            'https://gdfuyaubwqvmdqdlwajv.supabase.co/functions/v1/health'
+          ];
+          
+          (async () => {
+            const browser = await chromium.launch();
+          
+            for (const url of urls) {
+              try {
+                const page = await browser.newPage();
+                await page.goto(url, { 
+                  waitUntil: 'networkidle',
+                  timeout: 30000 
+                });
+                console.log('✅', url, 'loaded successfully');
+                await page.close();
+              } catch (error) {
+                console.log('❌', url, 'failed:', error.message);
+              }
+            }
+          
+            await browser.close();
+          })();
+          "
