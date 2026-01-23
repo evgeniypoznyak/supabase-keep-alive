@@ -27,7 +27,8 @@ jobs:
             'https://vkusnyashki.poznyaks.com',
             'https://evgeniy.poznyaks.com',
             'https://oydwzeanlzbmsfzyogia.supabase.co/functions/v1/health',
-            'https://gdfuyaubwqvmdqdlwajv.supabase.co/functions/v1/health'
+            'https://gdfuyaubwqvmdqdlwajv.supabase.co/functions/v1/health',
+            'https://hqjwcvszyxdtkoiqtzza.supabase.co/functions/v1/keep-alive'
           ];
           
           (async () => {
