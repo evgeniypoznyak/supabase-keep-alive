@@ -2,7 +2,7 @@
 
 A simple Node.js script that performs periodic HTTP pings to multiple URLs to keep services alive and prevent timeout/inactivity disconnections.
 
-## Overview
+## Overview 
 
 This utility sends GET requests to a list of URLs including web applications and Supabase Edge Functions. It's useful for:
 
