@@ -9,7 +9,9 @@
 //   pg     a direct Postgres connection. The one that still gets through
 //          when the gateway answers 402 on every path in the project, which
 //          is what an exceeded organisation quota looks like from outside.
-//          Learned on FaxGo, 2026-09-10.
+//          Learned on FaxGo, 2026-09-10, which then had to move to a new
+//          project because a restriction like that has no expiry you can
+//          wait out on a free plan.
 //
 // Supabase watches the database, not the gateway, so an http target only
 // counts against the pause timer if whatever answers it reads the database.
@@ -23,7 +25,7 @@ const HTTP_TARGETS = [
   'https://evgeniy.poznyaks.com',
   'https://gdfuyaubwqvmdqdlwajv.supabase.co/functions/v1/health',      // Jobbi
   'https://hqjwcvszyxdtkoiqtzza.supabase.co/functions/v1/keep-alive',  // softery.io
-  'https://mkvyjuxgzgchcwsvtlhk.supabase.co/functions/v1/health',      // FaxGo
+  'https://jwakvospfjkujqmwawcc.supabase.co/functions/v1/health',      // FaxGo
 ];
 
 // Dropped 2026-09-10: oydwzeanlzbmsfzyogia was the first Supabase project
