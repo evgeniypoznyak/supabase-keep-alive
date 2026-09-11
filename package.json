@@ -1,10 +1,16 @@
 {
   "name": "supabase-keep-alive",
   "version": "1.0.0",
-  "description": "",
+  "description": "Daily pings that stop free Supabase projects being paused for inactivity",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "pg": "^8.23.0"
   },
   "private": true
 }

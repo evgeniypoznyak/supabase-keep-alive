@@ -2,52 +2,29 @@ name: Keep Supabase Active
 
 on:
   schedule:
-    - cron: '0 0 * * *' # This runs every day at midnight
+    # Daily is plenty against a seven day pause timer, and it leaves six days
+    # of slack if one run fails.
+    - cron: '0 0 * * *'
   workflow_dispatch:
 
 jobs:
   keep-alive:
     runs-on: ubuntu-latest
     steps:
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
+      # The target list lives in index.js. It used to be pasted into this file
+      # as well, and the two copies drifted, which is how a deleted project
+      # stayed on the list for months.
+      - uses: actions/checkout@v4
 
-      - name: Check React apps
-        run: |
-          npm install playwright
-          npx playwright install chromium
-          
-          node -e "
-          const { chromium } = require('playwright');
-          const urls = [
-            'https://prompt.softery.io',
-            'https://recipe.softery.io',
-            'https://vkusnyashki.poznyaks.com',
-            'https://evgeniy.poznyaks.com',
-            'https://oydwzeanlzbmsfzyogia.supabase.co/functions/v1/health',
-            'https://gdfuyaubwqvmdqdlwajv.supabase.co/functions/v1/health',
-            'https://hqjwcvszyxdtkoiqtzza.supabase.co/functions/v1/keep-alive'
-          ];
-          
-          (async () => {
-            const browser = await chromium.launch();
-          
-            for (const url of urls) {
-              try {
-                const page = await browser.newPage();
-                await page.goto(url, { 
-                  waitUntil: 'networkidle',
-                  timeout: 30000 
-                });
-                console.log('✅', url, 'loaded successfully');
-                await page.close();
-              } catch (error) {
-                console.log('❌', url, 'failed:', error.message);
-              }
-            }
-          
-            await browser.close();
-          })();
-          "
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - run: npm ci
+
+      # A failing step is the alert: GitHub mails the owner when a scheduled
+      # workflow fails. Nothing here swallows an error on purpose.
+      - run: node index.js
+        env:
+          FAXGO_DB_URL: ${{ secrets.FAXGO_DB_URL }}
