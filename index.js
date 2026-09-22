@@ -26,6 +26,7 @@ const HTTP_TARGETS = [
   'https://gdfuyaubwqvmdqdlwajv.supabase.co/functions/v1/health',      // Jobbi
   'https://hqjwcvszyxdtkoiqtzza.supabase.co/functions/v1/keep-alive',  // softery.io
   'https://jwakvospfjkujqmwawcc.supabase.co/functions/v1/health',      // FaxGo
+  'https://bolucugxixbarmlqqojd.supabase.co/functions/v1/keep-alive',  // Muse
 ];
 
 // Dropped 2026-09-10: oydwzeanlzbmsfzyogia was the first Supabase project

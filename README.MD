@@ -25,6 +25,10 @@ against the pause timer if whatever answers it reads the database. The
 `/health` and `/keep-alive` functions do. The plain sites are on the list to
 stay warm, which is a different job.
 
+Muse uses the public `keep-alive` Edge Function on Supabase project
+`bolucugxixbarmlqqojd`. It checks database access before returning success.
+GitHub Actions needs no Muse API key or database password for this target.
+
 ## Adding a target
 
 HTTP targets are the `HTTP_TARGETS` array in `index.js`:
