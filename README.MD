@@ -101,3 +101,22 @@ watching. A manual run from the Actions tab re-enables it.
 ## License
 
 MIT
+
+## Radar
+
+`https://radar.softery.io/api/health/supabase` is the only Radar target. It reads
+one row from the currently configured Radar database on every completed probe,
+with no cached health response. It returns HTTP 200 and
+`{"ok":true,"service":"radar","database":"up"}` only after the read succeeds;
+failures return 503 without credentials or database error details.
+The runner rejects redirects, HTML and incorrect JSON fields. No Radar secret
+is required in GitHub Actions. The existing daily schedule remains unchanged.
+
+No legacy Radar project URL was found in the current local or committed target
+list/workflow on October 7, 2026. Do not add the retired `seqsmqthzhvvaxgeyqow`
+or `qrxmuungrbddzjqikcol` project endpoints. The active database is
+`rasdmtkexpgvopqloozx`, reached through the Radar server.
+
+Keep-alive adds database activity; it cannot guarantee that a Free project
+will never be paused or override billing restrictions. See
+[Supabase project pausing](https://supabase.com/docs/guides/platform/free-project-pausing).

@@ -4,7 +4,8 @@
   "description": "Daily pings that stop free Supabase projects being paused for inactivity",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "test": "node --test"
   },
   "engines": {
     "node": ">=20"

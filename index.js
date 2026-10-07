@@ -19,6 +19,10 @@
 // those entries are here to keep a site warm, which is a different job.
 
 const HTTP_TARGETS = [
+  {
+    url: 'https://radar.softery.io/api/health/supabase',
+    expectedHealth: { ok: true, service: 'radar', database: 'up' },
+  },
   'https://prompt.softery.io',
   'https://recipe.softery.io',
   'https://vkusnyashki.poznyaks.com',
@@ -49,13 +53,35 @@ function fail(message) {
   console.error(`❌ ${message}`);
 }
 
-async function pingHttp(url) {
+async function pingHttp(target) {
+  const { url, expectedHealth } = typeof target === 'string' ? { url: target } : target;
   try {
     const response = await fetch(url, {
-      redirect: 'follow',
+      redirect: expectedHealth ? 'error' : 'follow',
       signal: AbortSignal.timeout(HTTP_TIMEOUT_MS),
-      headers: { 'user-agent': 'supabase-keep-alive (github actions)' },
+      ...(expectedHealth ? { cache: 'no-store', credentials: 'omit' } : {}),
+      headers: {
+        'user-agent': 'supabase-keep-alive (github actions)',
+        ...(expectedHealth ? { accept: 'application/json' } : {}),
+      },
     });
+
+    if (expectedHealth) {
+      // A marketing page or cached login redirect must not pass as a DB check.
+      // Do not print this endpoint's body, including on application errors.
+      if (response.status !== 200 || response.redirected) {
+        fail(`${url}: expected HTTP 200 database health response, got ${response.status}`);
+        return;
+      }
+      const health = await response.json().catch(() => null);
+      if (!health || typeof health !== 'object' || Array.isArray(health)
+          || !Object.entries(expectedHealth).every(([key, value]) => health[key] === value)) {
+        fail(`${url}: invalid database health response`);
+        return;
+      }
+      console.log(`✅ ${url}: 200 OK | database up`);
+      return;
+    }
 
     if (response.ok) {
       console.log(`✅ ${url}: ${response.status} ${response.statusText}`);
@@ -137,4 +163,6 @@ async function keepAlive() {
   process.exitCode = 1;
 }
 
-keepAlive();
+if (require.main === module) keepAlive();
+
+module.exports = { HTTP_TARGETS, PG_TARGETS, pingHttp, keepAlive };

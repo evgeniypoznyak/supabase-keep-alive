@@ -23,6 +23,8 @@ jobs:
 
       - run: npm ci
 
+      - run: npm test
+
       # A failing step is the alert: GitHub mails the owner when a scheduled
       # workflow fails. Nothing here swallows an error on purpose.
       - run: node index.js
