@@ -31,6 +31,12 @@ const HTTP_TARGETS = [
   'https://hqjwcvszyxdtkoiqtzza.supabase.co/functions/v1/keep-alive',  // softery.io
   'https://jwakvospfjkujqmwawcc.supabase.co/functions/v1/health',      // FaxGo
   'https://bolucugxixbarmlqqojd.supabase.co/functions/v1/keep-alive',  // Muse
+  {
+    // Public browser key. RLS exposes only this constant sentinel row.
+    url: 'https://yomqhnktzlovtholeqgp.supabase.co/rest/v1/keep_alive?select=id&limit=1',
+    headers: { apikey: 'sb_publishable_BdTKC9Cx9OSvHmFfQ9BeDQ_ASA-XcnS' },
+    expectedRows: [{ id: 1 }],
+  },
 ];
 
 // Dropped 2026-09-10: oydwzeanlzbmsfzyogia was the first Supabase project
@@ -54,19 +60,21 @@ function fail(message) {
 }
 
 async function pingHttp(target) {
-  const { url, expectedHealth } = typeof target === 'string' ? { url: target } : target;
+  const { url, expectedHealth, expectedRows, headers = {} } = typeof target === 'string' ? { url: target } : target;
+  const databaseProbe = Boolean(expectedHealth || expectedRows);
   try {
     const response = await fetch(url, {
-      redirect: expectedHealth ? 'error' : 'follow',
+      redirect: databaseProbe ? 'error' : 'follow',
       signal: AbortSignal.timeout(HTTP_TIMEOUT_MS),
-      ...(expectedHealth ? { cache: 'no-store', credentials: 'omit' } : {}),
+      ...(databaseProbe ? { cache: 'no-store', credentials: 'omit' } : {}),
       headers: {
         'user-agent': 'supabase-keep-alive (github actions)',
-        ...(expectedHealth ? { accept: 'application/json' } : {}),
+        ...headers,
+        ...(databaseProbe ? { accept: 'application/json' } : {}),
       },
     });
 
-    if (expectedHealth) {
+    if (databaseProbe) {
       // A marketing page or cached login redirect must not pass as a DB check.
       // Do not print this endpoint's body, including on application errors.
       if (response.status !== 200 || response.redirected) {
@@ -74,8 +82,17 @@ async function pingHttp(target) {
         return;
       }
       const health = await response.json().catch(() => null);
-      if (!health || typeof health !== 'object' || Array.isArray(health)
-          || !Object.entries(expectedHealth).every(([key, value]) => health[key] === value)) {
+      const valid = expectedRows
+        ? Array.isArray(health) && health.length === expectedRows.length
+          && expectedRows.every((expected, index) => {
+            const row = health[index];
+            return row && typeof row === 'object' && !Array.isArray(row)
+              && Object.keys(row).length === Object.keys(expected).length
+              && Object.entries(expected).every(([key, value]) => row[key] === value);
+          })
+        : health && typeof health === 'object' && !Array.isArray(health)
+          && Object.entries(expectedHealth).every(([key, value]) => health[key] === value);
+      if (!valid) {
         fail(`${url}: invalid database health response`);
         return;
       }

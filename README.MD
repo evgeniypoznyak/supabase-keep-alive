@@ -120,3 +120,17 @@ or `qrxmuungrbddzjqikcol` project endpoints. The active database is
 Keep-alive adds database activity; it cannot guarantee that a Free project
 will never be paused or override billing restrictions. See
 [Supabase project pausing](https://supabase.com/docs/guides/platform/free-project-pausing).
+
+## SnapChange
+
+SnapChange queries `public.keep_alive` directly through the Supabase REST API
+on project `yomqhnktzlovtholeqgp`. The table contains one constant row, `id=1`.
+RLS allows anonymous and authenticated callers to read that row; it contains no
+customer, project, or account data. The published browser key is passed in the
+`apikey` header. No service key, database password, bearer token, or new GitHub
+secret is used.
+
+A successful check requires HTTP 200 and exactly `[{"id":1}]`. Redirects, empty
+results, HTML and other JSON fail. The request bypasses caches, and the runner
+does not log response bodies for database probes. The existing daily workflow
+reads this target from `index.js`; its schedule is unchanged.

@@ -29,6 +29,6 @@ for(const [name,body,status] of [['HTML','<html>ok</html>',200],['wrong service'
  });
 }
 test('Radar failure causes a nonzero complete run',async()=>{
- const h=harness(async url=>url.includes('radar.softery.io')?Response.json({ok:false},{status:503}):url.includes('redact.softery.io')?Response.json({ok:true,service:'softery-redact',database:'up'}):new Response('ok'));
+ const h=harness(async url=>url.includes('radar.softery.io')?Response.json({ok:false},{status:503}):url.includes('yomqhnktzlovtholeqgp.supabase.co')?Response.json([{id:1}]):url.includes('redact.softery.io')?Response.json({ok:true,service:'softery-redact',database:'up'}):new Response('ok'));
  await h.keepAlive();assert.equal(h.process.exitCode,1);assert.equal(h.errors.length,1);
 });
